@@ -1,8 +1,8 @@
 from flask import Flask, render_template
-from services.visits_counter import VisitsCounter
+from services.visits_counter import VisitsCounterService
 
 app = Flask(__name__)
-counter = VisitsCounter()
+counter = VisitsCounterService()
 
 @app.route('/home/')
 def home():
