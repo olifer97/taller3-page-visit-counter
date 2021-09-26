@@ -5,5 +5,4 @@ class VisitsCounterService:
         self.url = url
     
     def add_visit(self, key):
-        response = requests.post(self.url + '/visits', json={"key": key})
-        return response.json()['visits']
+        return requests.post(self.url + '/addVisit', json={"key": key})

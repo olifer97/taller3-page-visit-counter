@@ -1,25 +1,19 @@
-#from flask import Flask, render_template
 import os
 from flask import escape, render_template
 from services.visits_counter import VisitsCounterService
 
-#app = Flask(__name__)
-counter = VisitsCounterService(url=os.environ['PAGE_VISITS_COUNTER_URL'])
+page_visits_counter = os.environ['PAGE_VISITS_COUNTER_URL']
+counter = VisitsCounterService(url=page_visits_counter)
 
-#@app.route('/home/')
+
 def home(request):
-    count = counter.add_visit("home")
-    return render_template('home.html', counter=count)
+    counter.add_visit("home")
+    return render_template('home.html', url= page_visits_counter + '/getVisits')
 
-#@app.route('/about/')
 def about(request):
-    count = counter.add_visit("about")
-    return render_template('about.html', counter=count)
+    counter.add_visit("about")
+    return render_template('about.html', url= page_visits_counter + '/getVisits')
 
-#@app.route('/jobs/')
 def jobs(request):
-    count = counter.add_visit("jobs")
-    return render_template('jobs.html', counter=count)
-
-#if __name__ == '__main__':
-#    app.run(host="0.0.0.0", port="5000")
+    counter.add_visit("jobs")
+    return render_template('jobs.html', url= page_visits_counter + '/getVisits')
