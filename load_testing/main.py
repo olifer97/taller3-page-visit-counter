@@ -7,26 +7,9 @@ def is_static_file(f):
     else:
         return False
 
-'''
-class AuthBrowsingUser(TaskSet):
-    def on_start(l):
-        response = l.client.get("/user/login", name="Login")
-        soup = BeautifulSoup(response.text, "html.parser")
-        drupal_form_id = soup.select('input[name="form_build_id"]')[0]["value"]
-        r = l.client.post("/user/login", {"name":"nnewton", "pass":"hunter2", "form_id":"user_login_form", "op":"Log+in", "form_build_id":drupal_form_id})
-
-    @task(10)
-    def home(l):
-        response = l.client.get("/home", name="Frontpage (Auth)")
-        fetch_static_assets(l, response)
-
-class WebsiteAuthUser(HttpLocust):
-    task_set = AuthBrowsingUser  
-'''  
-
 class WebsiteAnonUser(HttpUser):
 
-    def fetch_static_assets(self, response):
+    def fetch_static_assets(self, response, key):
         resource_urls = set()
         soup = BeautifulSoup(response.text, "html.parser")
 
@@ -34,6 +17,10 @@ class WebsiteAnonUser(HttpUser):
             url =  res['src']
             if is_static_file(url):
                 resource_urls.add(url)
+                if 'getVisits' in url:
+                    resource_urls.add(res['counter-url'] + '?key=' + res['key'])
+                    #print(res['counter-url'])
+                    #print(res['key'])
             else:
                 print("Skipping: " + url)
 
@@ -45,13 +32,23 @@ class WebsiteAnonUser(HttpUser):
                 print("Skipping: " + url)
 
         for url in resource_urls:
-            #Note: If you are going to tag different static file paths differently,
-            #this is where I would normally do that.
-            print(url)
-            response = self.client.get(url, name="(Static File)")
+            if 'getVisits?key=' in url:
+                response = self.client.get(url, name="/getVisits")
+            else:
+                response = self.client.get(url, name=f"({key} Static File)")
             print(response.text)
 
-    @task
+    @task(1)
     def home(self):
         response = self.client.get("/home")
-        self.fetch_static_assets(response)
+        self.fetch_static_assets(response, 'home')
+
+    @task(2)
+    def about(self):
+        response = self.client.get("/about")
+        self.fetch_static_assets(response, 'about')
+
+    @task(3)
+    def jobs(self):
+        response = self.client.get("/jobs")
+        self.fetch_static_assets(response, 'jobs')

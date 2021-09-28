@@ -39,7 +39,7 @@ class DistributedCounter(object):
         # Initialize each shard with count=0
         for num in range(self._num_shards):
             shard = Shard()
-            col_ref.document(str(num)).set(shard.to_dict())
+            col_ref.document(str(num)).set(shard.to_dict(), merge=True)
     # [END firestore_solution_sharded_counter_create]
 
     # [START firestore_solution_sharded_counter_increment]
